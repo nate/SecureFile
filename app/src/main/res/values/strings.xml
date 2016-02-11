@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Term_Project</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_login_page">login_page</string>
+    <string name="title_activity_registration_page">registration_page</string>
+    <string name="title_activity_settings_page">settings_page</string>
+</resources>
