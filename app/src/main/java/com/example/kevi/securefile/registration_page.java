@@ -16,7 +16,7 @@ public class registration_page extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration_page);
     }
-    public void goToSettings(View view) {
+    public void goToLogin(View view) {
         Intent intent = new Intent(this, login_page.class);
         //EditText editText = (EditText) findViewById(R.id.edit_message);
         //String message = editText.getText().toString();
