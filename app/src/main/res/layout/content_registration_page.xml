@@ -20,7 +20,8 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:nestedScrollingEnabled="false" />
+        android:nestedScrollingEnabled="false"
+        android:onClick="goToLogin" />
 
     <TextView
         android:layout_width="wrap_content"
