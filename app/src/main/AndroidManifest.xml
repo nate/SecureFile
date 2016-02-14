@@ -2,34 +2,38 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.kevi.securefile">
 
-<application
-    android:allowBackup="true"
-    android:icon="@mipmap/ic_launcher"
-    android:label="@string/app_name"
-    android:supportsRtl="true"
-    android:theme="@style/AppTheme">
-    <activity
-        android:name=".MainActivity"
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme.NoActionBar">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
-    </activity>
-    <activity
-        android:name=".login_page"
-        android:label="@string/title_activity_login_page"
-        android:theme="@style/AppTheme.NoActionBar" />
-    <activity
-        android:name=".registration_page"
-        android:label="@string/title_activity_registration_page"
-        android:theme="@style/AppTheme.NoActionBar" />
-    <activity
-        android:name=".settings_page"
-        android:label="@string/title_activity_settings_page"
-        android:theme="@style/AppTheme.NoActionBar"></activity>
-</application>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".login_page"
+            android:label="@string/title_activity_login_page"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".registration_page"
+            android:label="@string/title_activity_registration_page"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".settings_page"
+            android:label="@string/title_activity_settings_page"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".receive_message_page"
+            android:label="@string/title_activity_receive_message_page"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+    </application>
 
 </manifest>
