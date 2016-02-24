@@ -1,4 +1,5 @@
 package com.example.kevi.securefile;
+
 import android.app.Activity;
 import android.app.Fragment;
 import android.graphics.Bitmap;
@@ -25,14 +26,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
 
-
 /**
- * A simple {@link android.app.Fragment} subclass.
+ * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
  * {@link ChatFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
@@ -40,10 +41,12 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class ChatFragment extends Fragment {
+    // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
+    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
     private EditText mInputMessageView;
@@ -52,10 +55,15 @@ public class ChatFragment extends Fragment {
     private List<Message> mMessages = new ArrayList<Message>();
     private RecyclerView.Adapter mAdapter;
 
+    public BigInteger Primeq;
+    public BigInteger Primea;
+    public String xA;
+    private BigInteger xB;
+    private String b=xB.toString(16);
     private Socket socket;
     {
         try{
-            socket = IO.socket("http://10.14.32.21:3000");
+            socket = IO.socket("http://10.14.32.35:3000");
         }catch(URISyntaxException e){
             throw new RuntimeException(e);
         }
@@ -68,6 +76,7 @@ public class ChatFragment extends Fragment {
      * @param param2 Parameter 2.
      * @return A new instance of fragment ChatFragment.
      */
+    // TODO: Rename and change types and number of parameters
     public static ChatFragment newInstance(String param1, String param2) {
         ChatFragment fragment = new ChatFragment();
         Bundle args = new Bundle();
@@ -87,6 +96,9 @@ public class ChatFragment extends Fragment {
         setHasOptionsMenu(true);
         socket.connect();
         socket.on("message", handleIncomingMessages);
+        socket.on("primeq", handleIncomingPrimeq);
+        socket.on("primea", handleIncomingPrimea);
+
     }
 
 
@@ -98,6 +110,7 @@ public class ChatFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_chat, container, false);
     }
 
+    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
@@ -138,6 +151,20 @@ public class ChatFragment extends Fragment {
 
     }
 
+   /* private void sendB(){
+
+        B=prime.modpow(a,gen);
+        String message =B;
+        addMessage(message);
+        JSONObject sendText = new JSONObject();
+        try{
+            sendText.put("text",message);
+            socket.emit("message", sendText);
+        }catch(JSONException e){
+
+        }
+
+    }*/
     private void sendMessage(){
         String message = mInputMessageView.getText().toString().trim();
         mInputMessageView.setText("");
@@ -221,7 +248,7 @@ public class ChatFragment extends Fragment {
                     String message;
                     String imageText;
                     try {
-                        message = data.getString("text").toString();
+                        message = data.getString("text");
                         addMessage(message);
 
                     } catch (JSONException e) {
@@ -238,7 +265,40 @@ public class ChatFragment extends Fragment {
             });
         }
     };
+    private Emitter.Listener handleIncomingPrimea = new Emitter.Listener(){
+        @Override
+        public void call(final Object... args){
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    String data = (String) args[0];
 
+                    Primea = new BigInteger(data, 16);
+                    data ="Prime base:"+Primea.toString();
+                    addMessage(data);
+
+                }
+            });
+        }
+    };
+    private Emitter.Listener handleIncomingPrimeq = new Emitter.Listener(){
+        @Override
+        public void call(final Object... args){
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    String data = (String) args[0];
+
+                    Primeq = new BigInteger(data, 16);
+                    data ="Prime base:"+Primeq.toString();
+                    addMessage(data);
+
+
+
+                }
+            });
+        }
+    };
     @Override
     public void onDetach() {
         super.onDetach();
@@ -256,6 +316,7 @@ public class ChatFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
         public void onFragmentInteraction(Uri uri);
     }
 

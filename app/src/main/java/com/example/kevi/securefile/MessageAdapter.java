@@ -18,7 +18,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
     public MessageAdapter(List<Message> messages) {
         mMessages = messages;
-      //  mUsernameColors = context.getResources().getIntArray(R.array.username_colors);
+        //  mUsernameColors = context.getResources().getIntArray(R.array.username_colors);
     }
 
     @Override
