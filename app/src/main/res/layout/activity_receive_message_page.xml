@@ -7,12 +7,6 @@
     android:fitsSystemWindows="true"
     tools:context="com.example.kevi.securefile.receive_message_page">
 
-    <android.support.design.widget.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
-
-    </android.support.design.widget.AppBarLayout>
 
     <include layout="@layout/content_receive_message_page" />
 

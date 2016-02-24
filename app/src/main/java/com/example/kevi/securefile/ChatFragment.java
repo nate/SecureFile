@@ -30,6 +30,7 @@ import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 
 /**
@@ -57,9 +58,11 @@ public class ChatFragment extends Fragment {
 
     public BigInteger Primeq;
     public BigInteger Primea;
-    public String xA;
-    private BigInteger xB;
-//    private String b=xB.toString(16);
+    Random rnd = new Random();
+    private BigInteger XB = new BigInteger(8, rnd);
+    BigInteger YA;
+
+
     private Socket socket;
     {
         try{

@@ -1,4 +1,5 @@
 package com.example.kevi.securefile;
+
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -19,8 +20,8 @@ public class receive_message_page extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_receive_message_page);
-        //etActionBar()..setDisplayHomeAsUpEnabled(true);
-        //getActionBar().setHomeButtonEnabled(true);
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //getSupportActionBar().setHomeButtonEnabled(true);
 
     }
 
