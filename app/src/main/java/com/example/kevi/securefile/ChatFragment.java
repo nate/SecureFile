@@ -59,7 +59,7 @@ public class ChatFragment extends Fragment {
     public BigInteger Primea;
     public String xA;
     private BigInteger xB;
-    private String b=xB.toString(16);
+//    private String b=xB.toString(16);
     private Socket socket;
     {
         try{
