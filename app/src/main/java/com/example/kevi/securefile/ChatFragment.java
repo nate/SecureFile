@@ -55,13 +55,13 @@ public class ChatFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private List<Message> mMessages = new ArrayList<Message>();
     private RecyclerView.Adapter mAdapter;
-
+    private BigInteger S;
     public BigInteger Primeq;
     public BigInteger Primea;
     Random rnd = new Random();
-    private BigInteger XB = new BigInteger(8, rnd);
+    private BigInteger XB = new BigInteger(4, rnd);
     BigInteger YA;
-
+    BigInteger YB;
 
     private Socket socket;
     {
@@ -101,6 +101,7 @@ public class ChatFragment extends Fragment {
         socket.on("message", handleIncomingMessages);
         socket.on("primeq", handleIncomingPrimeq);
         socket.on("primea", handleIncomingPrimea);
+        socket.on("YA", handleIncomingYA);
 
     }
 
@@ -268,6 +269,35 @@ public class ChatFragment extends Fragment {
             });
         }
     };
+    private Emitter.Listener handleIncomingYA = new Emitter.Listener(){
+        @Override
+        public void call(final Object... args){
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    String data = (String) args[0];
+
+                    YA = new BigInteger(data, 16);
+                    data ="YA : "+YA.toString(16);
+                    addMessage(data);
+                    YB=Primea.modPow(YA,Primeq);
+                    String yb= YB.toString();
+                    yb="YB: "+yb;
+                    addMessage(yb);
+                    addMessage(XB.toString());
+
+                    socket.emit("YB", YB.toString());
+
+                    S=YA.modPow(XB,Primeq);
+                    String s = S.toString();
+                    socket.emit("S",S.toString());
+                    s="S: "+s;
+                    addMessage(s);
+
+                }
+            });
+        }
+    };
     private Emitter.Listener handleIncomingPrimea = new Emitter.Listener(){
         @Override
         public void call(final Object... args){
@@ -277,7 +307,7 @@ public class ChatFragment extends Fragment {
                     String data = (String) args[0];
 
                     Primea = new BigInteger(data, 16);
-                    data ="Prime base:"+Primea.toString();
+                    data ="Prime A: "+Primea.toString();
                     addMessage(data);
 
                 }
@@ -293,7 +323,7 @@ public class ChatFragment extends Fragment {
                     String data = (String) args[0];
 
                     Primeq = new BigInteger(data, 16);
-                    data ="Prime base:"+Primeq.toString();
+                    data ="Prime Q: "+Primeq.toString();
                     addMessage(data);
 
 
