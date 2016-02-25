@@ -66,7 +66,7 @@ public class ChatFragment extends Fragment {
     private Socket socket;
     {
         try{
-            socket = IO.socket("http://10.14.32.35:3000");
+            socket = IO.socket("http://10.200.0.121:3000");
         }catch(URISyntaxException e){
             throw new RuntimeException(e);
         }
@@ -290,7 +290,6 @@ public class ChatFragment extends Fragment {
                         addMessage(xbs);
 
                         socket.emit("YB", YB);
-
                         S = YA.modPow(XB, Primeq);
                         String Ss = S.toString();
                         socket.emit("S", S.toString());
