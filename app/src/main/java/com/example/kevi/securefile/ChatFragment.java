@@ -275,24 +275,31 @@ public class ChatFragment extends Fragment {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    String data = (String) args[0];
+                    JSONObject data = (JSONObject) args[0];
+                    try {
+                        String sdata = data.getString("value");
+                        YA = new BigInteger(sdata);
+                        String s = "YA: " + sdata;
+                        addMessage(s);
+                        YB = Primea.modPow(XB, Primeq);
+                        String ybs = YB.toString();
+                        ybs = "YB: " + ybs;
+                        addMessage(ybs);
+                        String xbs = XB.toString();
+                        xbs = "XB: " + xbs;
+                        addMessage(xbs);
 
-                    YA = new BigInteger(data, 16);
-                    data ="YA : "+YA.toString(16);
-                    addMessage(data);
-                    YB=Primea.modPow(YA,Primeq);
-                    String yb= YB.toString();
-                    yb="YB: "+yb;
-                    addMessage(yb);
-                    addMessage(XB.toString());
+                        socket.emit("YB", YB);
 
-                    socket.emit("YB", YB.toString());
+                        S = YA.modPow(XB, Primeq);
+                        String Ss = S.toString();
+                        socket.emit("S", S.toString());
+                        Ss = "S: " + Ss;
+                        addMessage(Ss);
 
-                    S=YA.modPow(XB,Primeq);
-                    String s = S.toString();
-                    socket.emit("S",S.toString());
-                    s="S: "+s;
-                    addMessage(s);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
 
                 }
             });
@@ -304,12 +311,15 @@ public class ChatFragment extends Fragment {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    String data = (String) args[0];
-
-                    Primea = new BigInteger(data, 16);
-                    data ="Prime A: "+Primea.toString();
-                    addMessage(data);
-
+                    JSONObject data = (JSONObject) args[0];
+                    try {
+                        String sdata = data.getString("value");
+                        Primea=new BigInteger(sdata);
+                        String s ="Prime A: "+sdata;
+                        addMessage(s);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
             });
         }
@@ -320,13 +330,15 @@ public class ChatFragment extends Fragment {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    String data = (String) args[0];
-
-                    Primeq = new BigInteger(data, 16);
-                    data ="Prime Q: "+Primeq.toString();
-                    addMessage(data);
-
-
+                    JSONObject data = (JSONObject) args[0];
+                    try {
+                        String sdata = data.getString("value");
+                        Primeq=new BigInteger(sdata);
+                        String s ="Prime Q: "+sdata;
+                        addMessage(s);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
 
                 }
             });
