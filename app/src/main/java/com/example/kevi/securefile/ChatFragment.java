@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
@@ -26,6 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -56,17 +58,19 @@ public class ChatFragment extends Fragment {
     private List<Message> mMessages = new ArrayList<Message>();
     private RecyclerView.Adapter mAdapter;
     private BigInteger S;
+    private String name;
+
     public BigInteger Primeq;
     public BigInteger Primea;
     Random rnd = new Random();
-    private BigInteger XB = new BigInteger(4, rnd);
+    private BigInteger XB = new BigInteger(10, rnd);
     BigInteger YA;
     BigInteger YB;
 
     private Socket socket;
     {
         try{
-            socket = IO.socket("http://10.200.0.121:3000");
+            socket = IO.socket("http://10.200.113.111:3000");
         }catch(URISyntaxException e){
             throw new RuntimeException(e);
         }
@@ -98,6 +102,8 @@ public class ChatFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         socket.connect();
+        name="JOEY";
+        socket.emit("join", name);
         socket.on("message", handleIncomingMessages);
         socket.on("primeq", handleIncomingPrimeq);
         socket.on("primea", handleIncomingPrimea);
@@ -120,7 +126,6 @@ public class ChatFragment extends Fragment {
             mListener.onFragmentInteraction(uri);
         }
     }
-
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -154,21 +159,6 @@ public class ChatFragment extends Fragment {
 
 
     }
-
-   /* private void sendB(){
-
-        B=prime.modpow(a,gen);
-        String message =B;
-        addMessage(message);
-        JSONObject sendText = new JSONObject();
-        try{
-            sendText.put("text",message);
-            socket.emit("message", sendText);
-        }catch(JSONException e){
-
-        }
-
-    }*/
     private void sendMessage(){
         String message = mInputMessageView.getText().toString().trim();
         mInputMessageView.setText("");
@@ -292,9 +282,27 @@ public class ChatFragment extends Fragment {
                         socket.emit("YB", YB);
                         S = YA.modPow(XB, Primeq);
                         String Ss = S.toString();
-                        socket.emit("S", S.toString());
                         Ss = "S: " + Ss;
                         addMessage(Ss);
+                        try {
+                            File root = new File(Environment.getExternalStorageDirectory(), "Notes");
+                            if (!root.exists()) {
+                                root.mkdirs(); // this will create folder.
+                            }
+                            File filepath = new File(root, "UserConfig.txt");  // file path to save
+                            FileWriter writer = new FileWriter(filepath);
+                            writer.append(name+ " : ");
+                            writer.append(S.toString());
+
+                            writer.flush();
+                            writer.close();
+                            String m = "File generated with name " + "UserConfig.txt";
+                            addMessage(m);
+                        } catch (Exception e) {
+
+                            e.printStackTrace();
+
+                        }
 
                     } catch (JSONException e) {
                         e.printStackTrace();
