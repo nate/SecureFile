@@ -204,13 +204,13 @@ public class ChatFragment extends Fragment {
 
     }
     private void sendMessage() throws NoSuchAlgorithmException {
-
+        String s = S.toString();
         Encryption encryption= new Encryption.Builder()
                 .setKeyLength(128)
                 .setKeyAlgorithm("AES")
                 .setCharsetName("UTF8")
                 .setIterationCount(65536)
-                .setKey(S.toString())
+                .setKey(s)
                 .setDigestAlgorithm("SHA1")
                 .setSalt(name)
                 .setBase64Mode(Base64.DEFAULT)
@@ -330,12 +330,13 @@ public class ChatFragment extends Fragment {
                     String message;
                     String imageText;
                     try {
+                        String s = S.toString();
                         Encryption encryption= new Encryption.Builder()
                                 .setKeyLength(128)
                                 .setKeyAlgorithm("AES")
                                 .setCharsetName("UTF8")
                                 .setIterationCount(65536)
-                                .setKey(S.toString())
+                                .setKey(s)
                                 .setDigestAlgorithm("SHA1")
                                 .setSalt(name)
                                 .setBase64Mode(Base64.DEFAULT)
@@ -400,7 +401,7 @@ public class ChatFragment extends Fragment {
                             }
                             File filepath = new File(root, "UserConfig.txt");  // file path to save
                             FileWriter writer = new FileWriter(filepath);
-                            writer.append(name+ " : ");
+                            writer.append(name+ ":");
                             writer.append(S.toString());
 
                             writer.flush();
