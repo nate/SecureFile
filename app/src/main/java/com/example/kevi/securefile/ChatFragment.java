@@ -148,7 +148,10 @@ public class ChatFragment extends Fragment {
     }
     public void join(){
         try {
-            InputStream inputStream = new FileInputStream("UserConfig.txt");
+            File root = new File(Environment.getExternalStorageDirectory(), "Notes");
+            File filepath = new File(root, "UserConfig.txt");  // file path to save
+
+            InputStream inputStream = new FileInputStream(filepath);
 
             InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
@@ -161,10 +164,10 @@ public class ChatFragment extends Fragment {
 
             inputStream.close();
             String ret = stringBuilder.toString();
-            String[] seperated = ret.split(":");
-            name = seperated[0];
-            S = new BigInteger(seperated[1]);
+            name = ret.substring(0,ret.indexOf(":"));
+            String s = ret.substring(ret.indexOf(":") + 1);
 
+            S= new BigInteger(s);
             socket.emit("join", name);
 
 
