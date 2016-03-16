@@ -23,16 +23,23 @@ import com.github.nkzawa.socketio.client.Socket;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.net.URISyntaxException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import se.simbio.encryption.Encryption;
 
 
 /**
@@ -59,7 +66,6 @@ public class ChatFragment extends Fragment {
     private RecyclerView.Adapter mAdapter;
     private BigInteger S;
     private String name;
-
     public BigInteger Primeq;
     public BigInteger Primea;
     Random rnd = new Random();
@@ -101,13 +107,14 @@ public class ChatFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        socket.connect();
-        name="JOEY";
-        socket.emit("join", name);
-        socket.on("message", handleIncomingMessages);
-        socket.on("primeq", handleIncomingPrimeq);
-        socket.on("primea", handleIncomingPrimea);
-        socket.on("YA", handleIncomingYA);
+
+            socket.connect();
+            join();
+            socket.on("message", handleIncomingMessages);
+            //dh from server
+            socket.on("primeq", handleIncomingPrimeq);
+            socket.on("primea", handleIncomingPrimea);
+            socket.on("YA", handleIncomingYA);
 
     }
 
@@ -126,6 +133,7 @@ public class ChatFragment extends Fragment {
             mListener.onFragmentInteraction(uri);
         }
     }
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -137,6 +145,35 @@ public class ChatFragment extends Fragment {
                     + " must implement OnFragmentInteractionListener");
         }*/
 
+    }
+    public void join(){
+        try {
+            InputStream inputStream = new FileInputStream("UserConfig.txt");
+
+            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+            String receiveString = "";
+            StringBuilder stringBuilder = new StringBuilder();
+
+            while ( (receiveString = bufferedReader.readLine()) != null ) {
+                stringBuilder.append(receiveString);
+            }
+
+            inputStream.close();
+            String ret = stringBuilder.toString();
+            String[] seperated = ret.split(":");
+            name = seperated[0];
+            S = new BigInteger(seperated[1]);
+
+            socket.emit("join", name);
+
+
+        } catch (FileNotFoundException e) {
+            name="keeev";
+            socket.emit("join",name);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -153,19 +190,40 @@ public class ChatFragment extends Fragment {
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendMessage();
+                try {
+                    sendMessage();
+                } catch (NoSuchAlgorithmException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
 
     }
-    private void sendMessage(){
+    private void sendMessage() throws NoSuchAlgorithmException {
+
+        Encryption encryption= new Encryption.Builder()
+                .setKeyLength(128)
+                .setKeyAlgorithm("AES")
+                .setCharsetName("UTF8")
+                .setIterationCount(65536)
+                .setKey(S.toString())
+                .setDigestAlgorithm("SHA1")
+                .setSalt(name)
+                .setBase64Mode(Base64.DEFAULT)
+                .setAlgorithm("AES/CBC/PKCS5Padding")
+                .setSecureRandomAlgorithm("SHA1PRNG")
+                .setSecretKeyType("PBKDF2WithHmacSHA1")
+                .setIv(new byte[]{29, 88, -79, -101, -108, -38, -126, 90, 52, 101, -35, 114, 12, -48, -66, -30})
+                .build();
+
         String message = mInputMessageView.getText().toString().trim();
         mInputMessageView.setText("");
+        String encrypted = encryption.encryptOrNull(message);
         addMessage(message);
         JSONObject sendText = new JSONObject();
         try{
-            sendText.put("text",message);
+            sendText.put("text", encrypted);
             socket.emit("message", sendText);
         }catch(JSONException e){
 
@@ -248,6 +306,54 @@ public class ChatFragment extends Fragment {
                     } catch (JSONException e) {
                         // return;
                     }
+                    try {
+                        imageText = data.getString("image");
+                        addImage(decodeImage(imageText));
+                    } catch (JSONException e) {
+                        //retur
+                    }
+
+                }
+            });
+        }
+    };
+    private Emitter.Listener handleIncomingEncryptedMessages = new Emitter.Listener(){
+        @Override
+        public void call(final Object... args){
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    JSONObject data = (JSONObject) args[0];
+                    String message;
+                    String imageText;
+                    try {
+                        Encryption encryption= new Encryption.Builder()
+                                .setKeyLength(128)
+                                .setKeyAlgorithm("AES")
+                                .setCharsetName("UTF8")
+                                .setIterationCount(65536)
+                                .setKey(S.toString())
+                                .setDigestAlgorithm("SHA1")
+                                .setSalt(name)
+                                .setBase64Mode(Base64.DEFAULT)
+                                .setAlgorithm("AES/CBC/PKCS5Padding")
+                                .setSecureRandomAlgorithm("SHA1PRNG")
+                                .setSecretKeyType("PBKDF2WithHmacSHA1")
+                                .setIv(new byte[]{29, 88, -79, -101, -108, -38, -126, 90, 52, 101, -35, 114, 12, -48, -66, -30})
+                                .build();
+
+                        try {
+                            message = data.getString("text");
+                            String decrypted = encryption.decryptOrNull(message);
+                            addMessage(decrypted);
+
+                        } catch (JSONException e) {
+                            // return;
+                        }
+                    } catch (NoSuchAlgorithmException e) {
+                        e.printStackTrace();
+                    }
+
                     try {
                         imageText = data.getString("image");
                         addImage(decodeImage(imageText));
