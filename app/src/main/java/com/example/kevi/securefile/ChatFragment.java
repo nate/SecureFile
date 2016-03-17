@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +19,7 @@ import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 
+import org.apache.commons.codec.binary.Base64;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -32,14 +32,23 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URISyntaxException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import se.simbio.encryption.Encryption;
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
 
 /**
@@ -72,6 +81,8 @@ public class ChatFragment extends Fragment {
     private BigInteger XB = new BigInteger(10, rnd);
     BigInteger YA;
     BigInteger YB;
+
+    private static final byte[] iv ={29, 88, -79, -101, -108, -38, -126, 90, 52, 101, -35, 114, 12, -48, -66, -30};
 
     private Socket socket;
     {
@@ -197,15 +208,51 @@ public class ChatFragment extends Fragment {
                     sendMessage();
                 } catch (NoSuchAlgorithmException e) {
                     e.printStackTrace();
+                } catch (NoSuchPaddingException e) {
+                    e.printStackTrace();
+                } catch (InvalidKeyException e) {
+                    e.printStackTrace();
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                } catch (IllegalBlockSizeException e) {
+                    e.printStackTrace();
+                } catch (BadPaddingException e) {
+                    e.printStackTrace();
+                } catch (InvalidAlgorithmParameterException e) {
+                    e.printStackTrace();
                 }
             }
         });
 
 
     }
-    private void sendMessage() throws NoSuchAlgorithmException {
+
+    public static String encryptWithAESKey(String data, String key) throws NoSuchAlgorithmException, NoSuchPaddingException,
+            InvalidKeyException, IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException, InvalidAlgorithmParameterException {
+        SecretKey secKey = new SecretKeySpec(key.getBytes("UTF-8"),"AES");
+
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+
+        cipher.init(Cipher.ENCRYPT_MODE, secKey, new IvParameterSpec(iv));
+        byte[] newData = cipher.doFinal(data.getBytes());
+        return new String(newData,"UTF-8");
+    }
+
+    public static String decryptWithAESKey(String inputData, String key) throws NoSuchAlgorithmException,
+            NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException, InvalidAlgorithmParameterException {
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        SecretKey secKey = new SecretKeySpec(key.getBytes("UTF-8"), "AES");
+
+        cipher.init(Cipher.DECRYPT_MODE, secKey, new IvParameterSpec(iv));
+        byte[] newData = cipher.doFinal(org.apache.commons.codec.binary.Base64.decodeBase64(inputData.getBytes()));
+        return new String(newData);
+
+    }
+    private void sendMessage() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, UnsupportedEncodingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         String s = S.toString();
-        Encryption encryption= new Encryption.Builder()
+
+
+        /*Encryption encryption= new Encryption.Builder()
                 .setKeyLength(128)
                 .setKeyAlgorithm("AES")
                 .setCharsetName("UTF8")
@@ -213,16 +260,15 @@ public class ChatFragment extends Fragment {
                 .setKey(s)
                 .setDigestAlgorithm("SHA1")
                 .setSalt(name)
-                .setBase64Mode(Base64.DEFAULT)
                 .setAlgorithm("AES/CBC/PKCS5Padding")
                 .setSecureRandomAlgorithm("SHA1PRNG")
                 .setSecretKeyType("PBKDF2WithHmacSHA1")
                 .setIv(new byte[]{29, 88, -79, -101, -108, -38, -126, 90, 52, 101, -35, 114, 12, -48, -66, -30})
-                .build();
+                .build();*/
 
         String message = mInputMessageView.getText().toString().trim();
         mInputMessageView.setText("");
-        String encrypted = encryption.encryptOrNull(message);
+        String encrypted=encryptWithAESKey(message, s);
         addMessage(message);
         JSONObject sendText = new JSONObject();
         try{
@@ -281,15 +327,17 @@ public class ChatFragment extends Fragment {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bm.compress(Bitmap.CompressFormat.JPEG,100,baos);
         byte[] b = baos.toByteArray();
-        String encImage = Base64.encodeToString(b, Base64.DEFAULT);
+        String encImage = Base64.encodeBase64String(b);
         //Base64.de
         return encImage;
 
     }
 
-    private Bitmap decodeImage(String data)
+    public Bitmap decodeImage(String data)
     {
-        byte[] b = Base64.decode(data,Base64.DEFAULT);
+        String cp = data;
+        Base64 test = null;
+        byte[] b = test.decode(cp);
         Bitmap bmp = BitmapFactory.decodeByteArray(b,0,b.length);
         return bmp;
     }
@@ -331,7 +379,7 @@ public class ChatFragment extends Fragment {
                     String imageText;
                     try {
                         String s = S.toString();
-                        Encryption encryption= new Encryption.Builder()
+                        /*Encryption encryption= new Encryption.Builder()
                                 .setKeyLength(128)
                                 .setKeyAlgorithm("AES")
                                 .setCharsetName("UTF8")
@@ -339,20 +387,31 @@ public class ChatFragment extends Fragment {
                                 .setKey(s)
                                 .setDigestAlgorithm("SHA1")
                                 .setSalt(name)
-                                .setBase64Mode(Base64.DEFAULT)
                                 .setAlgorithm("AES/CBC/PKCS5Padding")
                                 .setSecureRandomAlgorithm("SHA1PRNG")
                                 .setSecretKeyType("PBKDF2WithHmacSHA1")
                                 .setIv(new byte[]{29, 88, -79, -101, -108, -38, -126, 90, 52, 101, -35, 114, 12, -48, -66, -30})
-                                .build();
+                                .build();*/
 
                         try {
                             message = data.getString("text");
-                            String decrypted = encryption.decryptOrNull(message);
+                            String decrypted=decryptWithAESKey(message,s);
                             addMessage(decrypted);
 
                         } catch (JSONException e) {
                             // return;
+                        } catch (NoSuchPaddingException e) {
+                            e.printStackTrace();
+                        } catch (InvalidAlgorithmParameterException e) {
+                            e.printStackTrace();
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        } catch (IllegalBlockSizeException e) {
+                            e.printStackTrace();
+                        } catch (BadPaddingException e) {
+                            e.printStackTrace();
+                        } catch (InvalidKeyException e) {
+                            e.printStackTrace();
                         }
                     } catch (NoSuchAlgorithmException e) {
                         e.printStackTrace();
@@ -380,14 +439,14 @@ public class ChatFragment extends Fragment {
                         String sdata = data.getString("value");
                         YA = new BigInteger(sdata);
                         String s = "YA: " + sdata;
-                        addMessage(s);
+                        //addMessage(s);
                         YB = Primea.modPow(XB, Primeq);
                         String ybs = YB.toString();
                         ybs = "YB: " + ybs;
-                        addMessage(ybs);
+                        //addMessage(ybs);
                         String xbs = XB.toString();
                         xbs = "XB: " + xbs;
-                        addMessage(xbs);
+                        //addMessage(xbs);
 
                         socket.emit("YB", YB);
                         S = YA.modPow(XB, Primeq);
@@ -433,7 +492,7 @@ public class ChatFragment extends Fragment {
                         String sdata = data.getString("value");
                         Primea=new BigInteger(sdata);
                         String s ="Prime A: "+sdata;
-                        addMessage(s);
+                      //  addMessage(s);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -452,7 +511,7 @@ public class ChatFragment extends Fragment {
                         String sdata = data.getString("value");
                         Primeq=new BigInteger(sdata);
                         String s ="Prime Q: "+sdata;
-                        addMessage(s);
+                        //addMessage(s);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
