@@ -19,7 +19,6 @@ import android.widget.ImageButton;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
-import com.scottyab.aescrypt.AESCrypt;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,10 +32,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URISyntaxException;
-import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -80,7 +77,7 @@ public class ChatFragment extends Fragment {
     private Socket socket;
     {
         try{
-            socket = IO.socket("http://10.200.117.160:3000");
+            socket = IO.socket("http://192.168.1.111:3000");
         }catch(URISyntaxException e){
             throw new RuntimeException(e);
         }
@@ -221,7 +218,7 @@ public class ChatFragment extends Fragment {
     private void sendMessage() throws NoSuchAlgorithmException {
 
 
-        try{
+       /* try{
             String message = mInputMessageView.getText().toString().trim();
             mInputMessageView.setText("");
             addMessage(message);
@@ -242,7 +239,26 @@ public class ChatFragment extends Fragment {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-        }
+        }*/
+
+            try {
+                JSONObject sendText = new JSONObject();
+
+                CryptLib _crypt = new CryptLib();
+                String output= "";
+                String plainText = mInputMessageView.getText().toString().trim();
+                mInputMessageView.setText("");
+                String password = S.toString();
+                String key = CryptLib.SHA256(password, 32); //32 bytes = 256 bit
+                String iv = "HCHXjb_wIURjCV3G"; //16 bytes = 128 bit
+                output = _crypt.encrypt(plainText, key, iv); //encrypt
+                sendText.put("text", output);
+                socket.emit("message", sendText);
+
+    } catch (Exception e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+    }
 
     }
 
@@ -340,7 +356,7 @@ public class ChatFragment extends Fragment {
                 public void run() {
                     JSONObject data = (JSONObject) args[0];
                     String imageText;
-                    try {
+                    /*try {
                         String message = data.getString("text");
                         byte[] hashedKey = MessageDigest.getInstance("SHA1").digest(S.toString().getBytes("UTF-8"));
                         String password = new String(hashedKey).substring(2,18);
@@ -354,8 +370,24 @@ public class ChatFragment extends Fragment {
                         e.printStackTrace();
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
+                    }*/
+                    try {
+                        CryptLib _crypt = new CryptLib();
+                        String output= "";
+                        String plainText = "This is the text to be encrypted.";
+                        byte[] hashedKey = MessageDigest.getInstance("SHA1").digest(S.toString().getBytes("UTF-8"));
+                        String password = new String(hashedKey).substring(2,18);
+                        String key = CryptLib.SHA256(password, 32); //32 bytes = 256 bit
+                        String iv = CryptLib.generateRandomIV(16); //16 bytes = 128 bit
+                        //output = _crypt.encrypt(plainText, key, iv); //encrypt
+                        //System.out.println("encrypted text=" + output);
+                        output = _crypt.decrypt(output, key,iv); //decrypt
+                        System.out.println("decrypted text=" + output);
+                        addMessage(output);
+                    } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
                     }
-
                     try {
                         imageText = data.getString("image");
                         addImage(decodeImage(imageText));
@@ -399,7 +431,7 @@ public class ChatFragment extends Fragment {
                             }
                             File filepath = new File(root, "UserConfig.txt");  // file path to save
                             FileWriter writer = new FileWriter(filepath);
-                            writer.append(name+ " : ");
+                            writer.append(name+ ":");
                             writer.append(S.toString());
 
                             writer.flush();
