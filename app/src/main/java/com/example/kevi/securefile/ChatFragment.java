@@ -2,6 +2,7 @@ package com.example.kevi.securefile;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -182,9 +183,10 @@ public class ChatFragment extends Fragment {
             S= new BigInteger(s);
             socket.emit("join", name);
 
-
         } catch (FileNotFoundException e) {
-            name="keeev";
+            Intent intent = getActivity().getIntent();
+            name=intent.getStringExtra("name");
+
             socket.emit("join",name);
         } catch (IOException e) {
             e.printStackTrace();
