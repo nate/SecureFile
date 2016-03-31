@@ -516,6 +516,7 @@ public class ChatFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         socket.disconnect();
+        getActivity().finish();
     }
 
 }

@@ -67,18 +67,17 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-
+        if (id == R.id.chat_rooms_icon) {
+            // Handle the contacts icon action
         }
 
-        else if (id == R.id.nav_gallery) {
+        else if (id == R.id.chat_icon) {
             Intent intent = new Intent(this, receive_message_page.class);
 
             startActivity(intent);
         }
 
-        else if (id == R.id.nav_slideshow) {
+        else if (id == R.id.profile_settings_icon) {
             Intent intent = new Intent(this, settings_page.class);
             startActivity(intent);
         }

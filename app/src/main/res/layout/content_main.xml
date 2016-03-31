@@ -19,7 +19,6 @@
         android:layout_height="wrap_content"
         android:text="Contacts"
         android:id="@+id/contacts"
-        android:background="@drawable/test"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />

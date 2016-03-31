@@ -16,7 +16,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Settings"
+        android:text="Profile Settings"
         android:id="@+id/text_settings"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
@@ -29,59 +29,68 @@
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Back"
-        android:id="@+id/back_button"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:text="Save"
         android:id="@+id/save_button"
-        android:layout_above="@+id/back_button"
-        android:layout_centerHorizontal="true" />
-
-    <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Files"
-        android:id="@+id/file_checkbox"
-        android:layout_marginBottom="105dp"
-        android:checked="true"
-        android:layout_above="@+id/save_button"
-        android:layout_toRightOf="@+id/back_button"
-        android:layout_toEndOf="@+id/back_button" />
-
-    <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Images"
-        android:id="@+id/image_checkbox"
-        android:checked="true"
-        android:layout_alignTop="@+id/file_checkbox"
-        android:layout_centerHorizontal="true" />
-
-    <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Exe"
-        android:id="@+id/exe_checkbox"
-        android:checked="true"
-        android:layout_alignTop="@+id/image_checkbox"
-        android:layout_toRightOf="@+id/image_checkbox"
-        android:layout_toEndOf="@+id/image_checkbox" />
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="77dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Save Location"
-        android:id="@+id/text_savelocation"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Choose your display name:"
+        android:id="@+id/text_displayname"
+        android:layout_marginTop="64dp"
         android:layout_below="@+id/text_settings"
-        android:layout_toLeftOf="@+id/save_button"
-        android:layout_toStartOf="@+id/save_button"
-        android:layout_marginTop="54dp" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/editText_displayname"
+        android:text="Display name"
+        android:layout_below="@+id/text_displayname"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/save_button"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/space">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Want others to see this name?"
+            android:id="@+id/textView_displaychoice" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Yes"
+            android:id="@+id/radioButton_yes"
+            android:checked="true" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No"
+            android:id="@+id/radioButton_no"
+            android:checked="false" />
+
+    </RadioGroup>
+
+    <Space
+        android:layout_width="20px"
+        android:layout_height="20px"
+        android:layout_below="@+id/editText_displayname"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/space" />
 
 </RelativeLayout>

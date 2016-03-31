@@ -78,6 +78,7 @@ public class receive_message_page extends AppCompatActivity {
             //Log.d("onActivityResult",imgDecodableString);
             ChatFragment fragment = (ChatFragment) getFragmentManager().findFragmentById(R.id.chat);
             fragment.sendImage(imgDecodableString);
+            finish();
         }
     }
 
