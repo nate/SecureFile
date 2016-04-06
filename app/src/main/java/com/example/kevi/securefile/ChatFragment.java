@@ -71,18 +71,20 @@ public class ChatFragment extends Fragment {
     Random rnd = new Random();
     private BigInteger XB = new BigInteger(10, rnd);
     BigInteger YA;
-    private final byte iv[] = {1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6};
+    private final byte iv[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 6};
     //{0x1D, 0x58, 0x4f, 0x65, 0x6c, 0x26, 0x7E, 0x5A, 0x34, 0x65, 0x23, 0x72, 0x0c, 0x30, 0x42, 0x1E, 0x1D, 0x58, 0x4f, 0x65, 0x6c, 0x26, 0x7E, 0x5A, 0x34, 0x65, 0x23, 0x72, 0x0c, 0x30, 0x42, 0x1E};
     BigInteger YB;
 
     private Socket socket;
+
     {
-        try{
+        try {
             socket = IO.socket("http://192.168.1.111:3000");
-        }catch(URISyntaxException e){
+        } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
     }
+
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -121,6 +123,11 @@ public class ChatFragment extends Fragment {
     }
 
 
+    @Override
+    public void onStop() {
+        super.onStop();
+
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -139,7 +146,7 @@ public class ChatFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mAdapter = new MessageAdapter( mMessages);
+        mAdapter = new MessageAdapter(mMessages);
         /*try {
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
@@ -152,16 +159,16 @@ public class ChatFragment extends Fragment {
 
     public static String bytesToHex(byte[] in) {
         final StringBuilder builder = new StringBuilder();
-        for(byte b : in) {
+        for (byte b : in) {
             builder.append(String.format("%02x", b));
         }
         return builder.toString();
     }
 
 
-    public void join(){
+    public void join() {
         try {
-            File root = new File(Environment.getExternalStorageDirectory(), "Notes");
+            File root = new File(Environment.getExternalStorageDirectory(), "Notes/SecureChat");
             File filepath = new File(root, "UserConfig.txt");  // file path to save
 
             InputStream inputStream = new FileInputStream(filepath);
@@ -171,23 +178,23 @@ public class ChatFragment extends Fragment {
             String receiveString = "";
             StringBuilder stringBuilder = new StringBuilder();
 
-            while ( (receiveString = bufferedReader.readLine()) != null ) {
+            while ((receiveString = bufferedReader.readLine()) != null) {
                 stringBuilder.append(receiveString);
             }
 
             inputStream.close();
             String ret = stringBuilder.toString();
-            name = ret.substring(0,ret.indexOf(":"));
+            name = ret.substring(0, ret.indexOf(":"));
             String s = ret.substring(ret.indexOf(":") + 1);
 
-            S= new BigInteger(s);
+            S = new BigInteger(s);
             socket.emit("join", name);
 
         } catch (FileNotFoundException e) {
             Intent intent = getActivity().getIntent();
-            name=intent.getStringExtra("name");
+            name = intent.getStringExtra("name");
 
-            socket.emit("join",name);
+            socket.emit("join", name);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -217,6 +224,7 @@ public class ChatFragment extends Fragment {
 
 
     }
+
     private void sendMessage() throws NoSuchAlgorithmException {
 
 
@@ -243,36 +251,35 @@ public class ChatFragment extends Fragment {
             e.printStackTrace();
         }*/
 
-            try {
-                JSONObject sendText = new JSONObject();
+        try {
+            JSONObject sendText = new JSONObject();
 
-                CryptLib _crypt = new CryptLib();
-                String output= "";
-                String plainText = mInputMessageView.getText().toString().trim();
-                mInputMessageView.setText("");
-                String password = S.toString();
-                String key = CryptLib.SHA256(password, 32); //32 bytes = 256 bit
-                String iv = "HCHXjb_wIURjCV3G"; //16 bytes = 128 bit
-                output = _crypt.encrypt(plainText, key, iv); //encrypt
-                sendText.put("text", output);
-                socket.emit("message", sendText);
+            CryptLib _crypt = new CryptLib();
+            String output = "";
+            String plainText = mInputMessageView.getText().toString().trim();
+            mInputMessageView.setText("");
+            String password = S.toString();
+            String key = CryptLib.SHA256(password, 32); //32 bytes = 256 bit
+            String iv = "HCHXjb_wIURjCV3G"; //16 bytes = 128 bit
+            output = _crypt.encrypt(plainText, key, iv); //encrypt
+            sendText.put("text", output);
+            socket.emit("message", sendText);
 
-    } catch (Exception e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
     }
 
-    }
-
-    public void sendImage(String path)
-    {
+    public void sendImage(String path) {
         JSONObject sendData = new JSONObject();
-        try{
+        try {
             sendData.put("image", encodeImage(path));
             Bitmap bmp = decodeImage(sendData.getString("image"));
             addImage(bmp);
-            socket.emit("message",sendData);
-        }catch(JSONException e){
+            socket.emit("message", sendData);
+        } catch (JSONException e) {
 
         }
     }
@@ -282,34 +289,34 @@ public class ChatFragment extends Fragment {
         mMessages.add(new Message.Builder(Message.TYPE_MESSAGE)
                 .message(message).build());
         // mAdapter = new MessageAdapter(mMessages);
-        mAdapter = new MessageAdapter( mMessages);
+        mAdapter = new MessageAdapter(mMessages);
         mAdapter.notifyItemInserted(0);
         scrollToBottom();
     }
 
-    private void addImage(Bitmap bmp){
+    private void addImage(Bitmap bmp) {
         mMessages.add(new Message.Builder(Message.TYPE_MESSAGE)
                 .image(bmp).build());
-        mAdapter = new MessageAdapter( mMessages);
+        mAdapter = new MessageAdapter(mMessages);
         mAdapter.notifyItemInserted(0);
         scrollToBottom();
     }
+
     private void scrollToBottom() {
         mMessagesView.scrollToPosition(mAdapter.getItemCount() - 1);
     }
 
-    private String encodeImage(String path)
-    {
+    private String encodeImage(String path) {
         File imagefile = new File(path);
         FileInputStream fis = null;
-        try{
+        try {
             fis = new FileInputStream(imagefile);
-        }catch(FileNotFoundException e){
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
         Bitmap bm = BitmapFactory.decodeStream(fis);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bm.compress(Bitmap.CompressFormat.JPEG,100,baos);
+        bm.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         byte[] b = baos.toByteArray();
         String encImage = Base64.encodeToString(b, Base64.DEFAULT);
         //Base64.de
@@ -317,44 +324,42 @@ public class ChatFragment extends Fragment {
 
     }
 
-    private Bitmap decodeImage(String data)
-    {
-        byte[] b = Base64.decode(data,Base64.DEFAULT);
-        Bitmap bmp = BitmapFactory.decodeByteArray(b,0,b.length);
+    private Bitmap decodeImage(String data) {
+        byte[] b = Base64.decode(data, Base64.DEFAULT);
+        Bitmap bmp = BitmapFactory.decodeByteArray(b, 0, b.length);
         return bmp;
     }
-    private Emitter.Listener handleIncomingMessages = new Emitter.Listener(){
+
+    private Emitter.Listener handleIncomingMessages = new Emitter.Listener() {
         @Override
-        public void call(final Object... args){
-            if (getActivity()!=null) {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        JSONObject data = (JSONObject) args[0];
-                        String message;
-                        String imageText;
-                        try {
-                            message = data.getString("text");
-                            addMessage(message);
+        public void call(final Object... args) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    JSONObject data = (JSONObject) args[0];
+                    String message;
+                    String imageText;
+                    try {
+                        message = data.getString("text");
+                        addMessage(message);
 
-                        } catch (JSONException e) {
-                            // return;
-                        }
-                        try {
-                            imageText = data.getString("image");
-                            addImage(decodeImage(imageText));
-                        } catch (JSONException e) {
-                            //retur
-                        }
-
+                    } catch (JSONException e) {
+                        // return;
                     }
-                });
-            }
+                    try {
+                        imageText = data.getString("image");
+                        addImage(decodeImage(imageText));
+                    } catch (JSONException e) {
+                        //retur
+                    }
+
+                }
+            });
         }
     };
-    private Emitter.Listener handleIncomingEncryptedMessages = new Emitter.Listener(){
+    private Emitter.Listener handleIncomingEncryptedMessages = new Emitter.Listener() {
         @Override
-        public void call(final Object... args){
+        public void call(final Object... args) {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -377,15 +382,15 @@ public class ChatFragment extends Fragment {
                     }*/
                     try {
                         CryptLib _crypt = new CryptLib();
-                        String output= "";
+                        String output = "";
                         String plainText = "This is the text to be encrypted.";
                         byte[] hashedKey = MessageDigest.getInstance("SHA1").digest(S.toString().getBytes("UTF-8"));
-                        String password = new String(hashedKey).substring(2,18);
+                        String password = new String(hashedKey).substring(2, 18);
                         String key = CryptLib.SHA256(password, 32); //32 bytes = 256 bit
                         String iv = CryptLib.generateRandomIV(16); //16 bytes = 128 bit
                         //output = _crypt.encrypt(plainText, key, iv); //encrypt
                         //System.out.println("encrypted text=" + output);
-                        output = _crypt.decrypt(output, key,iv); //decrypt
+                        output = _crypt.decrypt(output, key, iv); //decrypt
                         System.out.println("decrypted text=" + output);
                         addMessage(output);
                     } catch (Exception e) {
@@ -403,9 +408,9 @@ public class ChatFragment extends Fragment {
             });
         }
     };
-    private Emitter.Listener handleIncomingYA = new Emitter.Listener(){
+    private Emitter.Listener handleIncomingYA = new Emitter.Listener() {
         @Override
-        public void call(final Object... args){
+        public void call(final Object... args) {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -429,20 +434,19 @@ public class ChatFragment extends Fragment {
                         Ss = "S: " + Ss;
                         addMessage(Ss);
                         try {
-                            File root = new File(Environment.getExternalStorageDirectory(), "Notes");
+                            File root = new File(Environment.getExternalStorageDirectory(), "Notes/SecureChat");
                             if (!root.exists()) {
                                 root.mkdirs(); // this will create folder.
                             }
                             File filepath = new File(root, "UserConfig.txt");  // file path to save
                             FileWriter writer = new FileWriter(filepath);
-                            writer.append(name+ ":");
+                            writer.append(name + ":");
                             writer.append(S.toString());
 
                             writer.flush();
                             writer.close();
                             String m = "File generated with name " + "UserConfig.txt";
                             addMessage(m);
-                            getActivity().onBackPressed();
                         } catch (Exception e) {
 
                             e.printStackTrace();
@@ -452,22 +456,22 @@ public class ChatFragment extends Fragment {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-
+                    getActivity().onBackPressed();
                 }
             });
         }
     };
-    private Emitter.Listener handleIncomingPrimea = new Emitter.Listener(){
+    private Emitter.Listener handleIncomingPrimea = new Emitter.Listener() {
         @Override
-        public void call(final Object... args){
+        public void call(final Object... args) {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     JSONObject data = (JSONObject) args[0];
                     try {
                         String sdata = data.getString("value");
-                        Primea=new BigInteger(sdata);
-                        String s ="Prime A: "+sdata;
+                        Primea = new BigInteger(sdata);
+                        String s = "Prime A: " + sdata;
                         addMessage(s);
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -476,17 +480,17 @@ public class ChatFragment extends Fragment {
             });
         }
     };
-    private Emitter.Listener handleIncomingPrimeq = new Emitter.Listener(){
+    private Emitter.Listener handleIncomingPrimeq = new Emitter.Listener() {
         @Override
-        public void call(final Object... args){
+        public void call(final Object... args) {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     JSONObject data = (JSONObject) args[0];
                     try {
                         String sdata = data.getString("value");
-                        Primeq=new BigInteger(sdata);
-                        String s ="Prime Q: "+sdata;
+                        Primeq = new BigInteger(sdata);
+                        String s = "Prime Q: " + sdata;
                         addMessage(s);
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -496,6 +500,7 @@ public class ChatFragment extends Fragment {
             });
         }
     };
+
     @Override
     public void onDetach() {
         super.onDetach();

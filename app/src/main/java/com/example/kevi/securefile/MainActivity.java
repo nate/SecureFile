@@ -37,10 +37,12 @@ public class MainActivity extends AppCompatActivity
                 NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
                 navigationView.setNavigationItemSelectedListener(this);
             }
+
     @Override
     public void onResume() {
         super.onResume();
-        File root = new File(Environment.getExternalStorageDirectory(), "Notes");
+
+        File root = new File(Environment.getExternalStorageDirectory(), "Notes/SecureChat");
         File filepath = new File(root, "UserConfig.txt");
 
         if (!filepath.exists()) {
