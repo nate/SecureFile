@@ -326,28 +326,30 @@ public class ChatFragment extends Fragment {
     private Emitter.Listener handleIncomingMessages = new Emitter.Listener(){
         @Override
         public void call(final Object... args){
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    JSONObject data = (JSONObject) args[0];
-                    String message;
-                    String imageText;
-                    try {
-                        message = data.getString("text");
-                        addMessage(message);
+            if (getActivity()!=null) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        JSONObject data = (JSONObject) args[0];
+                        String message;
+                        String imageText;
+                        try {
+                            message = data.getString("text");
+                            addMessage(message);
 
-                    } catch (JSONException e) {
-                        // return;
-                    }
-                    try {
-                        imageText = data.getString("image");
-                        addImage(decodeImage(imageText));
-                    } catch (JSONException e) {
-                        //retur
-                    }
+                        } catch (JSONException e) {
+                            // return;
+                        }
+                        try {
+                            imageText = data.getString("image");
+                            addImage(decodeImage(imageText));
+                        } catch (JSONException e) {
+                            //retur
+                        }
 
-                }
-            });
+                    }
+                });
+            }
         }
     };
     private Emitter.Listener handleIncomingEncryptedMessages = new Emitter.Listener(){
@@ -440,6 +442,7 @@ public class ChatFragment extends Fragment {
                             writer.close();
                             String m = "File generated with name " + "UserConfig.txt";
                             addMessage(m);
+                            getActivity().onBackPressed();
                         } catch (Exception e) {
 
                             e.printStackTrace();
