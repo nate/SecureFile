@@ -25,10 +25,6 @@
             android:label="@string/title_activity_login_page"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".registration_page"
-            android:label="@string/title_activity_registration_page"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
             android:name=".settings_page"
             android:label="@string/title_activity_settings_page"
             android:theme="@style/AppTheme.NoActionBar" />
