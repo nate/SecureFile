@@ -27,6 +27,7 @@ public class settings_page extends AppCompatActivity {
                 String name = displayname.getText().toString();
                 intent.putExtra("name", name);
                 startActivity(intent);
+
             }
         });
 
