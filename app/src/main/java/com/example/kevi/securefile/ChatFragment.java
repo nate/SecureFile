@@ -71,15 +71,13 @@ public class ChatFragment extends Fragment {
     Random rnd = new Random();
     private BigInteger XB = new BigInteger(10, rnd);
     BigInteger YA;
-    private final byte iv[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 6};
-    //{0x1D, 0x58, 0x4f, 0x65, 0x6c, 0x26, 0x7E, 0x5A, 0x34, 0x65, 0x23, 0x72, 0x0c, 0x30, 0x42, 0x1E, 0x1D, 0x58, 0x4f, 0x65, 0x6c, 0x26, 0x7E, 0x5A, 0x34, 0x65, 0x23, 0x72, 0x0c, 0x30, 0x42, 0x1E};
     BigInteger YB;
 
     private Socket socket;
 
     {
         try {
-            socket = IO.socket("http://10.200.199.213:3000");
+            socket = IO.socket("http://192.168.1.111:3000");
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
@@ -147,12 +145,6 @@ public class ChatFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mAdapter = new MessageAdapter(mMessages);
-        /*try {
-            mListener = (OnFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }*/
 
     }
 
@@ -226,30 +218,6 @@ public class ChatFragment extends Fragment {
     }
 
     private void sendMessage() throws NoSuchAlgorithmException {
-
-
-       /* try{
-            String message = mInputMessageView.getText().toString().trim();
-            mInputMessageView.setText("");
-            addMessage(message);
-            JSONObject sendText = new JSONObject();
-            byte[] hashedKey = MessageDigest.getInstance("SHA256").digest(S.toString().getBytes("UTF-8"));
-
-            String password = bytesToHex(hashedKey);
-            password=password.substring(0,32);
-            System.out.println(password);
-            String encryptedMsg = AESCrypt.encrypt(password, message);
-
-            System.out.println(encryptedMsg);
-            sendText.put("text", encryptedMsg);
-            socket.emit("message", sendText);
-        }catch(JSONException e){
-
-        } catch (GeneralSecurityException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }*/
 
         try {
             JSONObject sendText = new JSONObject();
@@ -333,28 +301,30 @@ public class ChatFragment extends Fragment {
     private Emitter.Listener handleIncomingMessages = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    JSONObject data = (JSONObject) args[0];
-                    String message;
-                    String imageText;
-                    try {
-                        message = data.getString("text");
-                        addMessage(message);
+            if (getActivity()!=null) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        JSONObject data = (JSONObject) args[0];
+                        String message;
+                        String imageText;
+                        try {
+                            message = data.getString("text");
+                            addMessage(message);
 
-                    } catch (JSONException e) {
-                        // return;
-                    }
-                    try {
-                        imageText = data.getString("image");
-                        addImage(decodeImage(imageText));
-                    } catch (JSONException e) {
-                        //retur
-                    }
+                        } catch (JSONException e) {
+                            // return;
+                        }
+                        try {
+                            imageText = data.getString("image");
+                            addImage(decodeImage(imageText));
+                        } catch (JSONException e) {
+                            //retur
+                        }
 
-                }
-            });
+                    }
+                });
+            }
         }
     };
     private Emitter.Listener handleIncomingEncryptedMessages = new Emitter.Listener() {
@@ -365,31 +335,14 @@ public class ChatFragment extends Fragment {
                 public void run() {
                     JSONObject data = (JSONObject) args[0];
                     String imageText;
-                    /*try {
-                        String message = data.getString("text");
-                        byte[] hashedKey = MessageDigest.getInstance("SHA1").digest(S.toString().getBytes("UTF-8"));
-                        String password = new String(hashedKey).substring(2,18);
-                        byte[] decodedCipherText = Base64.decode(message, Base64.NO_WRAP);
-                        String decryptedMsg = AESCrypt.decrypt(password, decodedCipherText.toString());
-                        System.out.println(decryptedMsg);
-                        addMessage(decryptedMsg);
-                    }catch (GeneralSecurityException e){
-                        //handle error
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }*/
+
                     try {
                         CryptLib _crypt = new CryptLib();
                         String output = "";
-                        String plainText = "This is the text to be encrypted.";
                         byte[] hashedKey = MessageDigest.getInstance("SHA1").digest(S.toString().getBytes("UTF-8"));
                         String password = new String(hashedKey).substring(2, 18);
                         String key = CryptLib.SHA256(password, 32); //32 bytes = 256 bit
-                        String iv = CryptLib.generateRandomIV(16); //16 bytes = 128 bit
-                        //output = _crypt.encrypt(plainText, key, iv); //encrypt
-                        //System.out.println("encrypted text=" + output);
+                        String iv = "HCHXjb_wIURjCV3G"; //16 bytes = 128 bit
                         output = _crypt.decrypt(output, key, iv); //decrypt
                         System.out.println("decrypted text=" + output);
                         addMessage(output);
@@ -507,19 +460,9 @@ public class ChatFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
+        void onFragmentInteraction(Uri uri);
     }
 
     @Override
