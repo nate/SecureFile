@@ -15,6 +15,8 @@ import android.view.MenuItem;
 public class receive_message_page extends AppCompatActivity {
 
     String imgDecodableString;
+    private final String TAG = "myApp";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,6 +78,11 @@ public class receive_message_page extends AppCompatActivity {
             imgDecodableString = cursor.getString(columnIndex);
             cursor.close();
             //Log.d("onActivityResult",imgDecodableString);
+
+            Intent intent = getIntent();
+            String name=intent.getStringExtra("name");
+
+
             ChatFragment fragment = (ChatFragment) getFragmentManager().findFragmentById(R.id.chat);
             fragment.sendImage(imgDecodableString);
             getFragmentManager().beginTransaction().remove(fragment).commit();
