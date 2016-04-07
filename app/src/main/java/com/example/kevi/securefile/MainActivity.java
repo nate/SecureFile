@@ -27,8 +27,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
                 setContentView(R.layout.activity_main);
                 Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
                 setSupportActionBar(toolbar);
@@ -38,30 +36,7 @@ public class MainActivity extends AppCompatActivity
                         this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
                 drawer.setDrawerListener(toggle);
                 toggle.syncState();
-                View toastView = getLayoutInflater().inflate(R.layout.toast, (ViewGroup)findViewById(R.id.toastLayout));
-                NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-                navigationView.setNavigationItemSelectedListener(this);
-                ImageView imageView = (ImageView)toastView.findViewById(R.id.image);
 
-                imageView.setImageResource(R.drawable.test);
-//    imageView.setBackgroundDrawable(bitmapDrawable);
-
-                TextView textView = (TextView)toastView.findViewById(R.id.text);
-                final Toast toast = new Toast(this);
-
-                toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
-                toast.setDuration(Toast.LENGTH_SHORT);
-
-                toast.setView(toastView);
-
-                toast.show();
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        toast.cancel();
-            }
-        }, 1000);
             }
 
     @Override
@@ -74,6 +49,31 @@ public class MainActivity extends AppCompatActivity
         if (!filepath.exists()) {
             Intent intent = new Intent(this, settings_page.class);
             startActivity(intent);
+        }else {
+            View toastView = getLayoutInflater().inflate(R.layout.toast, (ViewGroup)findViewById(R.id.toastLayout));
+            NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+            navigationView.setNavigationItemSelectedListener(this);
+            ImageView imageView = (ImageView)toastView.findViewById(R.id.image);
+
+            imageView.setImageResource(R.drawable.test);
+//    imageView.setBackgroundDrawable(bitmapDrawable);
+
+            TextView textView = (TextView)toastView.findViewById(R.id.text);
+            final Toast toast = new Toast(this);
+
+            toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+            toast.setDuration(Toast.LENGTH_SHORT);
+
+            toast.setView(toastView);
+
+            toast.show();
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    toast.cancel();
+                }
+            }, 1000);
         }
 
     }

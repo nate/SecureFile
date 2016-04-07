@@ -372,20 +372,16 @@ public class ChatFragment extends Fragment {
                         String sdata = data.getString("value");
                         YA = new BigInteger(sdata);
                         String s = "YA: " + sdata;
-                        addMessage(s);
                         YB = Primea.modPow(XB, Primeq);
                         String ybs = YB.toString();
                         ybs = "YB: " + ybs;
-                        addMessage(ybs);
                         String xbs = XB.toString();
                         xbs = "XB: " + xbs;
-                        addMessage(xbs);
 
                         socket.emit("YB", YB);
                         S = YA.modPow(XB, Primeq);
                         String Ss = S.toString();
                         Ss = "S: " + Ss;
-                        addMessage(Ss);
                         try {
                             File root = new File(Environment.getExternalStorageDirectory(), "Notes/SecureChat");
                             if (!root.exists()) {
@@ -399,7 +395,6 @@ public class ChatFragment extends Fragment {
                             writer.flush();
                             writer.close();
                             String m = "File generated with name " + "UserConfig.txt";
-                            addMessage(m);
                         } catch (Exception e) {
 
                             e.printStackTrace();
@@ -425,7 +420,6 @@ public class ChatFragment extends Fragment {
                         String sdata = data.getString("value");
                         Primea = new BigInteger(sdata);
                         String s = "Prime A: " + sdata;
-                        addMessage(s);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -444,7 +438,6 @@ public class ChatFragment extends Fragment {
                         String sdata = data.getString("value");
                         Primeq = new BigInteger(sdata);
                         String s = "Prime Q: " + sdata;
-                        addMessage(s);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

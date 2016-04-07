@@ -27,6 +27,7 @@ public class settings_page extends AppCompatActivity {
                 String name = displayname.getText().toString();
                 intent.putExtra("name", name);
                 startActivity(intent);
+                finish();
 
             }
         });
@@ -34,15 +35,8 @@ public class settings_page extends AppCompatActivity {
     }
     @Override
     public void onBackPressed() {
-
-        int count = getFragmentManager().getBackStackEntryCount();
-
-        if (count == 0) {
-            super.onBackPressed();
-            //additional code
-        } else {
-            getFragmentManager().popBackStack();
-        }
+        super.onBackPressed();
+        finish();
 
     }
 }
